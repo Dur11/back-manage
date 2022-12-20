@@ -92,19 +92,35 @@
         :tableData="tableData"
         :tableLabel="tableLabel"
         :query="query"
+        :isOperate='true'
         @handleSizeChange="handleSizeChange"
         @handleCurrentChange="handleCurrentChange"
-        @edit="editUser"
-        @del="delUser"
-        @set="setPre"
+       
         ref="multipleTable"
-      ></CommonTable>
+      >
+      <template slot-scope="data">
+                 <el-button               
+                  size="mini"
+                  @click="editUser(data.row)">编辑</el-button>
+                  <el-button
+                 
+                 size="mini"
+                 type="warning"
+                 @click="setPre( data.row)">相关信息</el-button>
+                  <el-button
+                 
+                 size="mini"
+                 type="danger"
+                 @click="delUser( data.row)">删除</el-button>
+
+             </template>
+    </CommonTable>
  </div>
   </div>
 </template>
 
 <script>
-import CommonTable from '@/components/CommonTabler.vue'
+import CommonTable from '@/components/CommonTable.vue'
 // import CommonForm from '@/components/CommonForm.vue'
   export default {
     components:{CommonTable},

@@ -18,15 +18,21 @@
           <span style="margin-left=10px">{{ scope.row[item.prop] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="180" align="center">
+      <!-- <el-table-column label="操作" min-width="180" align="center">
         <template slot-scope="scope">
-          <!-- scope.row表示当前行的数据 -->
           <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>        
           <el-button size="mini" type="warning" @click="handleSet(scope.row)">相关信息</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
  
-      </el-table-column>
+      </el-table-column> -->
+      <el-table-column
+             label="操作"
+             v-if="isOperate">
+            <template slot-scope="scope">
+                <slot :row='scope.row' :index='scope.$index'></slot>
+             </template>
+        </el-table-column>
     </el-table>
     <div style="margin-top: 0.2rem; margin-left: 0.2rem">
         <el-pagination
@@ -49,6 +55,10 @@ export default {
     tableData: Array, //表格的数据
     tableLabel: Array, //表格的首行提示数据
     query: Object,// 用于传输的总数居 接收分页等配置
+    isOperate: {
+       type: Boolean,
+        default: false
+            }
     
   },
   data() {

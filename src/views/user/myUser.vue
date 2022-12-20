@@ -191,13 +191,28 @@
         :tableData="tableData"
         :tableLabel="tableLabel"
         :query="query"
+        :isOperate='true'
         @handleSizeChange="handleSizeChange"
         @handleCurrentChange="handleCurrentChange"
-        @changeTableData="changeTableData"
-        @edit="editUser"
-        @del="delUser"
-        @set="setPre"
-      ></CommonTable>
+        @changeTableData="changeTableData"       
+      >
+      <template slot-scope="data">
+                 <el-button               
+                  size="mini"
+                  @click="editUser(data.row)">编辑</el-button>
+                  <el-button
+                 
+                 size="mini"
+                 type="warning"
+                 @click="setPre( data.row)">相关信息</el-button>
+                  <el-button
+                 
+                 size="mini"
+                 type="danger"
+                 @click="delUser( data.row)">删除</el-button>
+
+             </template>
+    </CommonTable>
     </div>
   </div>
 </template>
