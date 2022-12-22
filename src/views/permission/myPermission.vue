@@ -14,12 +14,15 @@
         @set="setPre"
         ref="multipleTable"
       ></CommonTable>
-      <el-dialog :visible.sync="isOpen" width="50%">
-      <el-form>
+      <!-- 查看 -->
+      <el-dialog :visible.sync="isOpen" width="30%" title="用户权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="包含的权限有:">
           <el-tag v-for="(item,index) in this.preData" :key="index">{{item}}</el-tag>
     </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="isOpen = false">关闭</el-button>
         
@@ -33,7 +36,8 @@
       </div>
     </el-dialog> -->
     <!-- 添加限权 -->
-    <el-dialog :visible.sync="isAdd" width="50%">
+    <el-dialog :visible.sync="isAdd" width="30%" title="新增用户权限" class="dadd">
+     <el-card>
       <el-form>
         <el-form-item label="限权" >
           <el-select
@@ -48,14 +52,16 @@
           </el-select>
   </el-form-item>
       </el-form>
+     </el-card>
       <div slot="footer">
         <el-button @click="isAdd = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 删除 -->
-    <el-dialog :visible.sync="isdel" width="50%">
-      <el-form>
+    <el-dialog :visible.sync="isdel" width="30%" title="删除用户权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="限权" >
           <el-select
             v-model="value"
@@ -69,6 +75,7 @@
           </el-select>
   </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="isdel = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
@@ -114,7 +121,7 @@ export default{
       query: {
         //分页对象
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 8,
         total: 0,
       },
       table:[],
@@ -142,18 +149,15 @@ export default{
       // console.log(this.xquan.u_id);
       this.api.post('/user_resource/queryNONResourceByUId',this.xquan).then((res)=>{
         // console.log(111);
-        console.log(res.data);
         this.xdata=[]
         res.data.forEach(item=>{
           this.xdata.push(item)
         })
-        console.log(this.xdata);
       })
     },
     noSee(){
-      console.log(this.xquan);
+      // console.log(this.xquan);
       this.api.post('/user_resource/queryResourceByUId',this.xquan).then((res)=>{
-        console.log(res.data);
         this.ydata=[]
         res.data.forEach(item=>{
           this.ydata.push(item)
@@ -170,7 +174,7 @@ export default{
       const id=row.u_id
       this.api.post('/user_resource/queryResourceByUId', { u_id: id }).then((res) => {
           // $message、$confirm 为ElementUI弹出框的相关属性
-          console.log(res.msg);
+          // console.log(res.msg);
           this.preData=[]
           if(res.msg=='成功'){
             this.isOpen=true
@@ -183,7 +187,7 @@ export default{
             message: '该用户暂无权限',
           })
         }
-        console.log(this.preData)
+        // console.log(this.preData)
           })
     },
     delUser(row){
@@ -303,7 +307,7 @@ export default{
 </script>
 <style>
 .mainper{
-margin-top: 15px;
+margin-top: 5px;
 }
 .qxhead{
   height: 20px;

@@ -1,7 +1,9 @@
 <template>
   <div class="common-table">
     <!-- :data="用于存放请求数据回来的数组"  -->
-    <el-table :data="tableData" height="90%"  ref="multipleTable" @selection-change="handleSelectionChange"  stripe>
+    <el-table :data="tableData"  v-loading="tableData.length>0?false:true" 
+    element-loading-spinner="el-icon-loading"
+   border  :header-cell-style="{background:'#FAFAFA'}" ref="multipleTable" @selection-change="handleSelectionChange"  stripe>
       <el-table-column align="center" width="60px">&gt;</el-table-column>
       <el-table-column
         show-overflow-tooltip
@@ -21,19 +23,21 @@
       <el-table-column label="操作" min-width="180" align="center">
         <template slot-scope="scope">
           <!-- scope.row表示当前行的数据 -->
-          <el-button size="mini" @click="handleLook(scope.row)">查看权限</el-button>        
-          <el-button size="mini" type="primary" @click="handleSet(scope.row)">增加权限</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除权限</el-button>
+          <el-button size="mini" @click="handleLook(scope.row)" icon="el-icon-view">查看</el-button>        
+          <el-button size="mini" type="primary" @click="handleSet(scope.row)" icon="el-icon-plus">增加</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)" icon="el-icon-delete">删除</el-button>
         </template>
  
       </el-table-column>
     </el-table>
     <div style="margin-top: 0.2rem; margin-left: 0.2rem">
         <el-pagination
+        background
+        hide-on-single-page="Math.ceil((tableData.length)/(query.pageSize))>1?true:false"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="query.pageNum"
-        :page-sizes="[2, 3, 4, 5]"
+        :page-sizes="[ 3, 4, 5,8]"
         :page-size="query.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="query.total"

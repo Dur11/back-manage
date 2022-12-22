@@ -21,13 +21,14 @@
        <div class="luse">角色列表</div>
        
        <div class="ruse">
-        <el-button type="primary" @click="addRole" size="small">新增</el-button>
-      <el-button type="primary" @click="deleAll" size="small">批量删除</el-button>
+        <el-button type="primary" @click="addRole" size="small" icon="el-icon-plus">新增</el-button>
+      <el-button type="danger" @click="deleAll" size="small" icon="el-icon-delete">批量删除</el-button>
        </div>
       </div>
       <!-- 新增 -->
-      <el-dialog :visible.sync="isAdd" width="50%">
-      <el-form>
+      <el-dialog :visible.sync="isAdd" width="30%" title="新增角色" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="角色">
           <el-input v-model="add.r_name" style="width:200px" placeholder="请输入角色名"></el-input>
         </el-form-item>
@@ -44,18 +45,21 @@
           </el-select>
   </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="isAdd = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 编辑 -->
-    <el-dialog :visible.sync="isEdit" width="50%">
+    <el-dialog :visible.sync="isEdit" width="30%" title="角色修改" class="dadd">
+     <el-card>
       <el-form>
         <el-form-item label="角色">
           <el-input v-model="add.r_name" style="width:200px"></el-input>
         </el-form-item>
       </el-form>
+     </el-card>
       <div slot="footer">
         <el-button @click="isEdit = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
@@ -73,8 +77,9 @@
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog> -->
-    <el-dialog :visible.sync="isOpen" width="50%">
-      <el-form>
+    <el-dialog :visible.sync="isOpen" width="30%" title="角色权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="权限拥有:">
           <el-tag v-for="(item,index) in this.roleData" :key="index">{{item}}</el-tag>
     </el-form-item>
@@ -82,6 +87,7 @@
       <el-tag v-for="(item,index) in this.nroleData" :key="index">{{item}}</el-tag>
     </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="isOpen = false">关闭</el-button>
         
@@ -101,17 +107,19 @@
       <template slot-scope="data">
                  <el-button               
                   size="mini"
-                  @click="editUser(data.row)">编辑</el-button>
+                  @click="editUser(data.row)"
+                  icon="el-icon-edit">编辑</el-button>
                   <el-button
                  
                  size="mini"
-                 type="warning"
-                 @click="setPre( data.row)">相关信息</el-button>
+                 @click="setPre( data.row)"
+                 icon="el-icon-view">查看权限</el-button>
                   <el-button
                  
                  size="mini"
                  type="danger"
-                 @click="delUser( data.row)">删除</el-button>
+                 @click="delUser( data.row)"
+                 icon="el-icon-delete">删除</el-button>
 
              </template>
     </CommonTable>
@@ -120,7 +128,7 @@
 </template>
 
 <script>
-import CommonTable from '@/components/CommonTable.vue'
+import CommonTable from '@/components/CommonTablerole.vue'
 // import CommonForm from '@/components/CommonForm.vue'
   export default {
     components:{CommonTable},
@@ -185,7 +193,7 @@ import CommonTable from '@/components/CommonTable.vue'
       query: {
         //分页对象
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 8,
         total: 0,
       },
       form:{
@@ -214,9 +222,6 @@ import CommonTable from '@/components/CommonTable.vue'
     consult() {
         console.log(this.form);
           this.api.post('/roleList', this.form).then(res => {
-            // console.log(res);
-              // this.tableData = [];
-              // this.tableData = res;
               this.table = res
         const DataAll = this.table
         //每次执行方法，将展示的数据清空
@@ -267,13 +272,10 @@ import CommonTable from '@/components/CommonTable.vue'
       },
     confirm() {
       if (this.operateType == 'add') {
-        // console.log(this.operateForm)
-        console.log(this.add);
         this.api.post('/addRole', this.add).then((res) => {
-          // console.log(111);
-          // console.log(res)
-          this.isAdd = false //关闭弹窗
+          
           if(res==true){
+            this.isAdd = false //关闭弹窗
             this.$message({
             type: 'success',
             message: '添加成功',
@@ -285,11 +287,12 @@ import CommonTable from '@/components/CommonTable.vue'
           })
           }
           this.getList()
+          this.query.total = this.tableData.length
         })
         // getList()
       }else {
         this.api.post('/updateRoleById', this.add).then((res) => {
-          console.log(res.msg)
+          // console.log(res.msg)
           if(res.msg=='name存在'){
             this.$message({
             type: 'warning',
@@ -302,6 +305,7 @@ import CommonTable from '@/components/CommonTable.vue'
             message: '编辑成功',
           })
           this.getList()
+          this.query.total = this.tableData.length
           }
           
 
@@ -487,7 +491,7 @@ import CommonTable from '@/components/CommonTable.vue'
 }
 .rmanage-header{
   /* position: relative; */
-  margin-top: 10px;
+  margin-top: 5px;
   /* display: flex;
   justify-content: space-between;
         align-items: center; */
@@ -506,16 +510,5 @@ import CommonTable from '@/components/CommonTable.vue'
   padding: 5px 20px;
   border-bottom:1px solid #e9eef3;
 }
-/* .ruse el-button{
-  font-size: 24px;
-} */
-/* .this.tableData-header .alldel{
-  position: absolute;
-  left: 80px;
-} */
-/* .manage-header .select{
-  width: 200px;
-  position: absolute;
-  left: 0;
-} */
+
 </style>

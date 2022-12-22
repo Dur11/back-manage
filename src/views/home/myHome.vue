@@ -20,6 +20,8 @@
                     </div>
                 </div>
             </div>
+            
+ 
     </el-header>
    
     <el-container class="content">
@@ -27,8 +29,8 @@
         <!-- 侧边栏导航  -->
         <!-- router开启路由模式 -->
         <el-menu
-          :unique-opened="true"
-          :router="true"
+        default-active="2"
+          
           class="menu"
           background-color="#182e3d"
           text-color="#fff"
@@ -36,6 +38,7 @@
         >
           <!-- 没有子集 -->
           <el-menu-item
+          @click="clickMenu(item)"
             v-for="item in nochildren"
             :index="item.path + ''"
             :key="item.path"
@@ -59,6 +62,7 @@
               v-for="(item, index) in item.children"
               :key="index"
               :index="item.path"
+              @click="clickMenu(item)"
             >
               <span>{{ item.name }}</span>
             </el-menu-item>
@@ -66,8 +70,15 @@
         </el-menu>
       </el-aside>
       <!-- <CommonTag></CommonTag> -->
-      <el-main class="main">      
-        <router-view></router-view>
+      <el-main class="main">
+        <div class="bread">
+  <el-breadcrumb separator="|">
+    <el-breadcrumb-item  v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.name}}</el-breadcrumb-item>
+</el-breadcrumb>
+ </div>      
+        <transition mode="out-in">
+ <router-view class="center"></router-view>
+</transition>
       </el-main>
     </el-container>
   </el-container>
@@ -76,6 +87,7 @@
 <script>
 import moment from "moment";
 import headPic from '@/views/home/logo2.png'
+import { mapState } from 'vuex'
 // import CommonTag from '@/components/CommonTag.vue'
 export default {
   // name: '',
@@ -112,7 +124,7 @@ export default {
         // },
         
       ],
-      // menu:[],
+      transitionName: 'slide-left',
     }
   },
   created() {
@@ -143,16 +155,29 @@ export default {
     },
     goHome(){
       this.$router.push('/home')
-    }
+    },
+    clickMenu(item) {
+            this.$router.push({
+                name: item.name,
+            });
+            console.log(item);
+            // 调用selectMenu 并传入item
+            this.$store.commit('selectMenu',item)
+
+        },
   },
   computed: {
     nochildren() {
+      console.log(this.menu);
       return this.menu.filter((item) =>!item.children
       )
     },
     haschildren() {
       return this.menu.filter((item) => item.children)
     },
+    ...mapState({
+      tags:state=>state.tabList
+    })
     // asyncMenu(){
     //         //  获取menu
     //         console.log(this.menu);
@@ -193,6 +218,13 @@ export default {
     line-height: 50px;
     position: relative;
     min-width: 980px;
+}
+.bread{
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+height: 30px;
+background-color: #fff;
 }
 .title {
     color: #ddf4fe;
@@ -298,5 +330,32 @@ img {
 }
 .aside {
   background-color: #1B2939;
+}
+/* .transitionRouter-enter-active,
+.transitionRouter-leave-active {
+    transition: all 0.4s;
+}
+
+.transitionRouter-enter,
+.transitionRouter-leave{
+    transform: translate3d(100%, 0, 0);
+} */
+.v-enter{
+ opacity: 0;
+}
+.v-enter-active{
+ transition: 0.3s;
+}
+.v-enter-to{
+ opacity: 1;
+}
+.v-leave{
+ opacity: 1;
+}
+.v-leave-to{
+ opacity:0;
+}
+.v-leave-active{
+ transition: 0.3s;
 }
 </style>

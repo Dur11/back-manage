@@ -52,16 +52,17 @@
         >
       </el-form-item>
     </el-form>
-    <el-dialog :visible.sync="isMsg" width="30%">
+    <!-- <el-dialog :visible.sync="isMsg" width="20%" class="dadd msg">
       {{ msg }}
-    </el-dialog>
-    <el-dialog :visible.sync="isOpen" width="30%">
+    </el-dialog> -->
+    <el-dialog :visible.sync="isOpen" width="20%" class="dadd">
       {{ msg }}
     </el-dialog>
   </div>
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -116,44 +117,65 @@ export default {
               name: '首页',
               order: '1',
               path: 'show',
+              icon:'s-home',
             },
             {
               name: '用户管理',
               order: '1',
               path: 'user',
+              icon:'user-solid',
             },
             {
               name: '角色管理',
               order: '1',
               path: 'role',
+              icon:'s-custom'
             },
             {
               name: '用户权限管理',
               order: '1',
               path: 'permission',
+              icon:'s-tools'
             },{
               name: '权限管理',
               order: '1',
               path: 'power',
+              icon:'setting'
             },
           ]),
             console.log(res.data.s_id)
           if (res.data.s_id == 1) {
             this.$router.push({ path: '/home' })
             this.$store.commit('setMenu', this.menu)
-            this.isOpen = true
+            // this.isOpen = true
             this.msg = '管理员登陆成功'
+            this.$message({
+            type: 'success',
+            message:  this.msg,
+          })
           } else {
-            this.isOpen = true
+            // this.isOpen = true
             this.msg = '用户登陆成功'
+            this.$message({
+            type: 'success',
+            message:  this.msg,
+          })
             this.changeCodeImg()
           }
         }else{
           if(res.code == 500){
-            alert('输入格式错误，请重新输入')
+            this.$message({
+            type: 'warning',
+            message: '输入格式错误，请重新输入',
+          })
+            // alert('输入格式错误，请重新输入')
           }else{
-            this.isMsg = true
+            // this.isMsg = true
             this.msg = res.msg
+            this.$message({
+            type: 'error',
+            message:  this.msg,
+          })
             // console.log(res.msg)
             this.changeCodeImg()
           }
@@ -167,7 +189,10 @@ export default {
 <style scoped>
 .login-warp {
   height: 100%;
-  background-color: #324152;
+  /* background-color: #324152; */
+  background: url(@/assets/back.jpg) no-repeat;
+  background-size: 100% 100%;
+    background-attachment: fixed;/* 不设置的话页面滑动时，背景会不铺满*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -197,5 +222,8 @@ export default {
 }
 .yan > el-input {
   width: 150px;
+}
+.msg .el-dialog__body{
+  font-size: 40px;
 }
 </style>

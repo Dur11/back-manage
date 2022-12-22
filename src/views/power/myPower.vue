@@ -1,16 +1,18 @@
 <template>
   <div class="mainpow">
-    <div class="head">
+    <!-- <div class="head"> -->
         <!-- <span>用户管理</span> -->
-        <div class="lheadp">权限列表</div>
-        <div class="set">
-          <el-button type="primary" @click="addPow" style="height: 40px"
+        <!-- <div class="lheadp"> -->
+          <el-tabs v-model="activeName">
+    <el-tab-pane label="权限列表" name="first">
+      <div class="powlist">
+        <div class="lpow">权限列表</div>
+        <div class="rpow">
+          <el-button class="plus" type="primary" @click="addPow"  size="small" icon="el-icon-plus"
           >新增</el-button>
-          <el-button type="primary" @click="sharePow" style="height: 40px"
-          >分配权限</el-button>
         </div>
-        </div>
-    <CommonTable
+      </div>
+      <CommonTable
         :tableData="tableData"
         :tableLabel="tableLabel"
         :query="query"
@@ -19,33 +21,9 @@
         @del="delPow"
         @edit="editUser"
       ></CommonTable>
-       <!-- 添加限权 -->
-    <el-dialog :visible.sync="isAdd" width="50%">
-      <el-form>
-        <el-form-item label="限权" >
-          <el-input v-model="add.re_name" style="width:200px" placeholder="请输入权限名，如：权限2"></el-input>
-  </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="isAdd = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 编辑限权 -->
-    <el-dialog :visible.sync="isEdit" width="50%">
-      <el-form>
-  
-        <el-form-item label="限权" >
-          <el-input v-model="edit.re_name" style="width:200px"></el-input>
-  </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="isEdit = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 分配权限-查看 -->
-    <el-dialog :visible.sync="isShare" width="60%">
+    </el-tab-pane>
+    <el-tab-pane label="分配权限列表" name="second">
+      <div class="pow">角色权限列表</div>
       <PowTable
         :tableData="tablePow"
         :tableLabel="powLabel"
@@ -56,24 +34,56 @@
         @edit="shareAdd"
         @set="shareSee"
       ></PowTable>
+    </el-tab-pane>
+  </el-tabs>
+  
+       <!-- 添加限权 -->
+    <el-dialog :visible.sync="isAdd" width="30%" title="新增权限" class="dadd">
+      <el-card>
+        <el-form>
+        <el-form-item label="限权" >
+          <el-input v-model="add.re_name" style="width:200px" placeholder="请输入权限名，如：权限2"></el-input>
+  </el-form-item>
+      </el-form>
+      </el-card>
       <div slot="footer">
-        <el-button @click="isShare = false">关闭</el-button>
+        <el-button @click="isAdd = false">取 消</el-button>
+        <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="isOpen" width="50%">
-      <el-form>
+    <!-- 编辑限权 -->
+    <el-dialog :visible.sync="isEdit" width="30%" title="修改权限" class="dadd">
+      <el-card>
+        <el-form>
+  
+  <el-form-item label="限权" >
+    <el-input v-model="edit.re_name" style="width:200px"></el-input>
+</el-form-item>
+</el-form>
+      </el-card>
+      <div slot="footer">
+        <el-button @click="isEdit = false">取 消</el-button>
+        <el-button type="primary" @click="confirm">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 分配权限-查看 -->
+    <el-dialog :visible.sync="isOpen" width="30%" title="角色权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="包含的权限有:">
           <el-tag v-for="(item,index) in this.preData" :key="index">{{item}}</el-tag>
     </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="isOpen = false">关闭</el-button>
         
       </div>
     </el-dialog>
     <!-- 分配权限-增加 -->
-     <el-dialog :visible.sync="ispowAdd" width="50%">
-      <el-form>
+     <el-dialog :visible.sync="ispowAdd" width="30%" title="添加权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="限权" >
           <el-select
             v-model="value"
@@ -87,14 +97,16 @@
           </el-select>
   </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="ispowAdd = false">取 消</el-button>
         <el-button type="primary" @click="confirmPow">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- 分配权限-增加 -->
-    <el-dialog :visible.sync="ispowDel" width="50%">
-      <el-form>
+    <!-- 分配权限-删除 -->
+    <el-dialog :visible.sync="ispowDel" width="30%" title="删除权限" class="dadd">
+      <el-card>
+        <el-form>
         <el-form-item label="限权" >
           <el-select
             v-model="value"
@@ -108,6 +120,7 @@
           </el-select>
   </el-form-item>
       </el-form>
+      </el-card>
       <div slot="footer">
         <el-button @click="ispowDel = false">取 消</el-button>
         <el-button type="primary" @click="confirmPow">确 定</el-button>
@@ -150,13 +163,13 @@ export default{
       query: {
         //分页对象
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 8,
         total: 0,
       },
       pquery: {
         //分页对象
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 8,
         total: 0,
       },
       table:[],
@@ -199,11 +212,13 @@ export default{
       addpow:{
         r_id:'',
         re_id:''
-      }
+      },
+      activeName: 'first'
     }
   },
   created(){
     this.getList()
+    this.getRole()
    
   },
   methods:{
@@ -343,13 +358,11 @@ export default{
       },
     
     delPow(row){
-      console.log(row);
       this.$confirm('确定删除该条数据?', '提示', {
         cancelButtonText: '取消',
         confirmButtonText: '确定',
         type: 'warning',
-      }).then((res) => {
-        console.log(res)
+      }).then(() => {
         const id = row.re_id
         this.api.post('/delResource', { re_id: id }).then(() => {
           // $message、$confirm 为ElementUI弹出框的相关属性
@@ -363,11 +376,10 @@ export default{
     },
     confirm() {
       if (this.operateType == 'add') {
-        console.log(this.add)
         this.api.post('/addResource', this.add).then((res) => {
-          console.log(res);
-          this.isAdd = false //关闭弹窗
-          if(res==true){
+         
+          if(res.code==200){
+            this.isAdd = false //关闭弹窗
             this.$message({
             type: 'success',
             message: '添加成功',
@@ -375,7 +387,7 @@ export default{
           }else{
             this.$message({
             type: 'warning',
-            message: '添加失败',
+            message: '该权限名称已存在',
           })
           }
           this.getList()
@@ -384,9 +396,10 @@ export default{
         // getList()
       } else {
         this.api.post('/updateResourceById', this.edit).then((res) => {
-          console.log(res);
-          this.isEdit= false //关闭弹窗
+         
+          console.log(res.code);
           if(res.code==200){
+            this.isEdit= false //关闭弹窗
             this.$message({
             type: 'success',
             message: '编辑成功',
@@ -451,6 +464,7 @@ this.api.post('/role_resource/queryResourceByRId',this.xquan).then((res)=>{
   }else{
     this.ispowDel=true
   }
+
 })
 },
 confirmPow(){
@@ -505,13 +519,34 @@ confirmPow(){
 </script>
 <style>
 .mainpow{
-  margin-top: 15px;
+  margin-top: 5px;
 }
-.head{
+/* .head{
   padding: 5px 10px;
   border-bottom: 1px solid #e9eef3;
 }
 .lheadp{
   padding: 10px 10px;
+} */
+.plus{
+  position: absolute;
+  top: 8px;
+  right: 10px;
+}
+.el-tabs__nav-scroll{
+  background-color: #fff;
+  height: 50px;
+  padding: 0 20px;
+}
+.powlist{
+  position:relative;
+  background-color: #fff;
+  height: 30px;
+  padding: 10px 20px;
+}
+.pow{
+  background-color: #fff;
+  height: 30px;
+  padding: 10px 20px;
 }
 </style>

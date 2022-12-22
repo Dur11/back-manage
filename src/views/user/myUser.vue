@@ -9,6 +9,8 @@
             placeholder="性别"
             @change="seSelect"
             style="width: 150px"
+            clearable
+    @clear="setValueNull"
           >
             <el-option
               v-for="item in sexSelect"
@@ -57,21 +59,27 @@
             ></el-option>
           </el-select>
           <el-button type="primary" @click="consult()">查询</el-button>
+          <!-- <el-button type="primary" @click="reset()">重置</el-button> -->
         </div>
-        
+        <el-button type="primary" @click="addUser" style="height: 40px" icon="el-icon-plus"
+          >新增</el-button
+        >
       </div>
       <div class="head">
         <!-- <span>用户管理</span> -->
-        <el-button type="primary" @click="addUser" style="height: 40px"
+        <!-- <el-button type="primary" @click="addUser" style="height: 40px" icon="el-icon-plus"
           >新增</el-button
-        >
+        > -->
+        <div class="luse">用户列表</div>
         <div class="sea">
-            <div class="opt">
-                <el-select
+          <div>
+  <el-input placeholder="请输入内容"  v-model.trim="inputContent" class="input-with-select">
+    <el-select
             v-model="value5"
             placeholder="请选择"
             @change="inSelect"
             style="width: 100px"
+            slot="prepend"
           >
             <el-option
               v-for="item in idName"
@@ -80,40 +88,27 @@
               :value="item.value"
             ></el-option>
           </el-select>
-            </div>
-          <el-input
-          class="inp"
-            v-model.trim="inputContent"
-            placeholder="请输入内容"
-            style="width: 150px"
-          ></el-input>
-          <el-button type="primary" @click="getSearch" class="search"
-            >搜索</el-button
-          >
+    <el-button slot="append" icon="el-icon-search"  @click="getSearch" class="search"></el-button>
+  </el-input>
+</div>
         </div>
       </div>
 
       
     </div>
     <!-- 增加 -->
-    <el-dialog :visible.sync="isAdd" width="50%">
+    <el-dialog :visible.sync="isAdd" width="30%"  title="新增用户" class="dadd">
+    <el-card>
       <el-form>
           <el-form-item label="姓名">
-    <el-input v-model="add.u_name" style="width:200px" placeholder="请输入姓名"></el-input>
+    <el-input v-model="add.u_name" style="width:200px" placeholder="请输入姓名" required></el-input>
         </el-form-item>
         <el-form-item label="年龄">
     <el-input v-model="add.u_age" style="width:200px" placeholder="请输入年龄"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-select
-            v-model="value6"
-            placeholder="请选择"
-            @change="inSex"
-            style="width: 150px"
-          >
-          <el-option label="男" value="男"></el-option>
-      <el-option label="女" value="女"></el-option>
-          </el-select>
+          <el-radio v-model="add.u_sex" label="男">男</el-radio>
+  <el-radio v-model="add.u_sex" label="女">女</el-radio>
   </el-form-item>
   <el-form-item label="身份">
           <el-select
@@ -128,14 +123,16 @@
           </el-select>
   </el-form-item>
       </el-form>
+    </el-card>
       <div slot="footer">
         <el-button @click="isAdd = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 编辑 -->
-    <el-dialog :visible.sync="isedit" width="50%">
-      <el-form>
+    <el-dialog :visible.sync="isedit" width="30%" title="修改用户信息" class="dadd">
+      <el-card>
+        <el-form>
           <el-form-item label="姓名">
     <el-input v-model="add.u_name" style="width:200px"></el-input>
         </el-form-item>
@@ -143,25 +140,21 @@
     <el-input v-model="add.u_age" style="width:200px"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-select
-            v-model="value6"
-            placeholder="请选择"
-            @change="inSex"
-            style="width: 150px"
-          >
-          <el-option label="男" value="男"></el-option>
-      <el-option label="女" value="女"></el-option>
-          </el-select>
+          <el-radio v-model="add.u_sex" label="男">男</el-radio>
+  <el-radio v-model="add.u_sex" label="女">女</el-radio>
   </el-form-item>
       </el-form>
+      
+      </el-card>
       <div slot="footer">
         <el-button @click="isedit = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
     
-    <el-dialog :visible.sync="isOpen" width="30%" class="perData">
-      <el-form>
+    <el-dialog :visible.sync="isOpen" width="30%" class="dadd perData" title="用户相关信息" text-algin='center'>
+      <el-card>
+        <el-form>
         <el-form-item label="姓名:">
           {{this.basicdata.u_name}}
     </el-form-item>
@@ -185,6 +178,7 @@
         <el-button @click="isOpen = false">关闭</el-button>
         
       </div>
+      </el-card>
     </el-dialog>
     <div class="manage-table">
       <CommonTable
@@ -199,17 +193,20 @@
       <template slot-scope="data">
                  <el-button               
                   size="mini"
-                  @click="editUser(data.row)">编辑</el-button>
+                  @click="editUser(data.row)"
+                  icon="el-icon-edit">编辑</el-button>
                   <el-button
                  
                  size="mini"
                  type="warning"
-                 @click="setPre( data.row)">相关信息</el-button>
+                 @click="setPre( data.row)"
+                 icon="el-icon-setting">相关信息</el-button>
                   <el-button
                  
                  size="mini"
                  type="danger"
-                 @click="delUser( data.row)">删除</el-button>
+                 @click="delUser( data.row)"
+                 icon="el-icon-delete">删除</el-button>
 
              </template>
     </CommonTable>
@@ -287,11 +284,11 @@ export default {
       idName: [
         {
           value: '0',
-          label: 'id号',
+          label: '按id号查找',
         },
         {
           value: '1',
-          label: '姓名',
+          label: '按姓名查找',
         }
       ],
       value1: [],
@@ -383,7 +380,7 @@ export default {
       query: {
         //分页对象
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 8,
         total: 0,
       },
       // 搜索条件
@@ -426,6 +423,9 @@ export default {
   },
   mounted() {},
   methods: {
+    setValueNull() {
+           this.value1=null;
+        },
     inSex(val){
       this.add.u_sex=val
     },
@@ -459,7 +459,6 @@ export default {
       if (this.operateType == 'add') {
         console.log(this.add)
         this.api.post('/addUser', this.add).then((res) => {
-          console.log(res);
           this.isAdd = false //关闭弹窗
           if(res==true){
             this.$message({
@@ -471,6 +470,13 @@ export default {
             type: 'warning',
             message: '添加失败',
           })
+          }
+          this.add={
+            u_id: '',
+        u_name: '',
+        u_age: '',
+        u_sex: '',
+        s_id: '',
           }
           this.getList()
          
@@ -562,8 +568,6 @@ export default {
     getList() {
       this.api.get('/userPage').then((res) => {
         this.table=[]
-        // console.log(111);
-        console.log(res);
         this.table = res.records
         const DataAll = this.table
         //每次执行方法，将展示的数据清空
@@ -640,11 +644,19 @@ export default {
         }else{
             this.api.post('/getUserById', this.searchForm).then(res => {
                 // const DataAll = this.table
-                this.tableData = [];
+                
             //   res.forEach(item=>this.tableData.push(item))
+            if(res.code==500){
+            this.$message({
+            type: 'warning',
+            message: '输入格式有问题，请重新输入',
+              }) }else{
+                this.tableData = [];
                 if(res){
                   this.tableData.push(res);
                 }
+              }
+                
                   console.log(this.tableData.length);
                   this.query.total = this.tableData.length
             });
@@ -656,11 +668,12 @@ export default {
             this.getList();
         }else{
             this.api.post('/getUserByName', this.searchForm).then(res => {
-             
                 this.tableData = [];
-              if(res){
+  
+                if(res){
+                  console.log(res);
                 res.forEach(item=>this.tableData.push(item))
-              }
+              }          
               this.query.total = this.tableData.length
                 // this.tableData.push(res);
                   // console.log(this.tableData);
@@ -736,9 +749,9 @@ export default {
 }
 </script>
 
-<style scope>
+<style>
 .manage{
-margin-top: 15px;
+margin-top: 5px;
 }
 .manage-header {
   /* display: flex;
@@ -754,8 +767,13 @@ align-items: center; */
   display: flex;
   justify-content: space-between;
   background-color: #fff;
-  margin-bottom: 0px;
+  height: 40px;
   margin-top: 5px;
+  padding: 5px 20px;
+}
+.luse{
+  margin-top: 5px;
+  padding: 0 10px;
 }
 .head > span {
   font-size: 30px;
@@ -767,6 +785,7 @@ align-items: center; */
   height: 60px;
   background-color: #fff;
   margin-top: 5px;
+  padding: 0 20px;
   /* margin-left: 5px; */
 }
 .chaxun{
@@ -778,8 +797,9 @@ align-items: center; */
 .sea {
     /* float: left; */
 position: absolute;
-width: 317px;
+width: 336px;
 right: 0;
+padding: 0 20px;
 
 }
 .opt{
@@ -791,7 +811,31 @@ float: left;
 .sea .inp{
     margin: 0 -12px;
 }
-.perData .el-dialog__body{
+.search{
+  background-color: red;
+}
+/* .perData .el-dialog__body{
   padding: 0 50px !important;
+} */
+.dadd .el-dialog{
+  border-radius: 8px;
+}
+.el-dialog{
+  border-radius: 8px;
+
+  border: 1px solid rgb(13, 210, 236);
+}
+/* .el-dialog.el-dialog--center {
+    border-radius: 8px !important;
+  }
+  */
+  .dadd .el-dialog__title{
+    color: #338fcc;
+  }
+  .dadd .el-dialog__header{
+    /* text-align: center; */
+  }
+.dadd .el-dialog__body{
+  /* padding:20px 80px ; */
 }
 </style>

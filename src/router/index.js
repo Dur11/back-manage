@@ -28,24 +28,29 @@ const router = new VueRouter({
           name: '首页',
           path: '/show',
           component: Show,
+          meta:{index:1}
         },
         {
           name: '用户管理',
           path: '/user',
           component: User,
+          meta:{index:2}
         },
         {
           name: '角色管理',
           path: '/role',
           component: Role,
+          meta:{index:3}
         },{
           name: '用户权限管理',
           path: '/permission',
           component: Permission,
+          meta:{index:4}
         },{
           name: '权限管理',
           path: '/power',
           component: Power,
+          meta:{index:5}
         },
         // {
         //   name: '管理',
