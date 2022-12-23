@@ -38,7 +38,6 @@
     <div style="margin-top: 0.2rem; margin-left: 0.2rem">
         <el-pagination
         background
-        hide-on-single-page="Math.ceil((tableData.length)/(query.pageSize))>1?true:false"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="query.pageNum"
@@ -61,8 +60,7 @@ export default {
     isOperate: {
        type: Boolean,
         default: false
-            }
-    
+            },
   },
   data() {
     return {
@@ -106,7 +104,7 @@ export default {
 </script>
 <style scope>
 .common-table {
-  height: 560px;
+  height: 530px;
   background-color: #fff;
   position: relative;
 }

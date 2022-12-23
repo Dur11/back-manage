@@ -1,7 +1,7 @@
 <template>
   <div class="common-table">
     <!-- :data="用于存放请求数据回来的数组"  -->
-    <el-table :data="tableData" v-loading="tableData.length>0?false:true" 
+    <el-table :data="tableData"  height="90%" v-loading="tableData.length>0?false:true" 
     element-loading-spinner="el-icon-loading"
       ref="multipleTable" @selection-change="handleSelectionChange"  border  :header-cell-style="{background:'#FAFAFA'}" stripe>
       <el-table-column type="selection" width="50" align="center"></el-table-column>
@@ -39,7 +39,6 @@
     <div style="margin-top: 0.2rem; margin-left: 0.2rem">
         <el-pagination
         background
-        hide-on-single-page="Math.ceil((tableData.length)/(query.pageSize))>1?true:false"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="query.pageNum"

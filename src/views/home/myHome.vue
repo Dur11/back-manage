@@ -29,8 +29,7 @@
         <!-- 侧边栏导航  -->
         <!-- router开启路由模式 -->
         <el-menu
-        default-active="2"
-          
+        :default-active="activePath"
           class="menu"
           background-color="#182e3d"
           text-color="#fff"
@@ -73,8 +72,10 @@
       <el-main class="main">
         <div class="bread">
   <el-breadcrumb separator="|">
-    <el-breadcrumb-item  v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.name}}</el-breadcrumb-item>
-</el-breadcrumb>
+    <!-- <el-breadcrumb-item  v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.name}}</el-breadcrumb-item> -->
+  <el-breadcrumb-item :to="{path:'/show'}">首页</el-breadcrumb-item>
+  <el-breadcrumb-item :to="'/'+tags.path" v-if="tags">{{tags.name}}</el-breadcrumb-item>
+  </el-breadcrumb>
  </div>      
         <transition mode="out-in">
  <router-view class="center"></router-view>
@@ -125,6 +126,7 @@ export default {
         
       ],
       transitionName: 'slide-left',
+      activePath:''
     }
   },
   created() {
@@ -139,13 +141,16 @@ export default {
     setInterval(() => {
       this.currentDate = moment().format("YYYY年MM月DD日 HH:mm:ss");
     }, 1000);
+    // this.activePath=this.$route.path
+    // console.log(111);
+    // console.log(this.activePath);
   },
   methods: {
     // 获取导航数据
     getMenus() {
       this.menu=this.$store.state.menu
       // console.log(1111);
-      console.log(this.menu);
+      // console.log(this.menu);
     },
     handleSignout() {
       // 提示
@@ -160,12 +165,25 @@ export default {
             this.$router.push({
                 name: item.name,
             });
-            console.log(item);
+            // console.log(item);
+            this.activePath=item.path
+            // console.log('/'+this.activePath);
             // 调用selectMenu 并传入item
             this.$store.commit('selectMenu',item)
 
         },
   },
+  // watch: {
+  //   '$route.path': function (newVal) {
+  //     // 为了防止和原有的高亮更新操作冲突，这里只更新自己需要的路由
+
+  //     if (newVal === '/show') {
+  //       // 为 :default-active 绑定的值 activepath 重新赋值，从而实现菜单栏的高亮更新
+  //       this.activePath = newVal
+  //       console.log(this.activePath);
+  //     }
+  //   }
+  // },
   computed: {
     nochildren() {
       console.log(this.menu);
@@ -176,15 +194,26 @@ export default {
       return this.menu.filter((item) => item.children)
     },
     ...mapState({
-      tags:state=>state.tabList
-    })
-    // asyncMenu(){
-    //         //  获取menu
-    //         console.log(this.menu);
-    //   return this.$store.state.menu
+      tags:state=>state.currentMenu
       
-    //      }
-  }
+    }),
+  
+    // onRoutes() {
+    //   const route = this.$route
+    //   const { meta, path } = route
+    //   // 可以在路由配置文件中设置自定义的路由路径到meta.activeMenu属性中，来控制菜单自定义高亮显示
+    //   // meta中 有activeMenu 字段的页面，都会显示高亮
+    //   console.log(meta)
+    //   if (meta.activeMenu) {
+    //     return meta.activeMenu
+    //   }
+    //   return path
+    // }
+    // activePath(){
+    //   // console.log(this.$route.path);
+    //   return this.$route.path.replace('/','')
+    // }
+    }
 }
 </script>
 

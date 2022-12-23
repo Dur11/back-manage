@@ -5,12 +5,12 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state:{
-    tabList: [{
-      name: '首页',
-              order: '1',
-              path: 'show',
-              icon:'s-home',
-  }],
+  //   tabList: [{
+  //     name: '首页',
+  //             order: '1',
+  //             path: 'show',
+  //             icon:'s-home',
+  // }],
   // 设置一个变量，存储点击的tab
   currentMenu: null,
     menu:[],
@@ -31,14 +31,21 @@ export default new Vuex.Store({
     state.token=data
   },
   selectMenu(state, val) {
-    if (val.name != '首页') {
-        state.currentMenu = val
-        const result = state.tabList.findIndex(item => item.name === val.name)
-        if (result == -1) {
-            state.tabList.push(val)
-        } else {
-            state.currentMenu = null
-        }
+    // if (val.name != '首页') {
+    //     state.currentMenu = val
+    //     const result = state.tabList.findIndex(item => item.name === val.name)
+    //     if (result == -1) {
+    //         state.tabList.push(val)
+    //     } else {
+    //         state.currentMenu = null
+    //     }
+    // }
+    if(val.name !=='首页'){
+      state.currentMenu = val
+      
+    }else{
+      state.currentMenu = null
+      // console.log(state.currentMenu);
     }
 },
 //   getMenu(state){

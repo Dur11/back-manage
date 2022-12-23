@@ -274,7 +274,7 @@ export default {
 .mains {
   margin-top: 5px;
   /* background-color: white; */
-  height: 680px;
+  height: 660px;
 }
 .title {
   /* background-color: rgb(128, 32, 32); */
@@ -344,7 +344,7 @@ export default {
   align-items: center;
   background-color: #fff;
 
-  padding: 20px 50PX;
+  padding: 10px 40PX;
 }
 .user{
   display: flex;
