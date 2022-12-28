@@ -1,10 +1,12 @@
 <template>
   <div class="table">
     <!-- :data="用于存放请求数据回来的数组"  -->
-    <el-table :data="tableData"  height="90%" v-loading="tableData.length>0?false:true" 
-    element-loading-spinner="el-icon-loading"
+    <el-table  :data="tableData.slice((query.pageNum-1)*query.pageSize,query.pageNum*query.pageSize)"  height="90%" v-loading="tableData.length>0?false:true" 
+    element-loading-spinner="el-icon-loading" @sort-change="sortChanges"
      border  :header-cell-style="{background:'#FAFAFA'}" ref="multipleTable" @selection-change="handleSelectionChange"  stripe>
       <el-table-column align="center" width="60px">&gt;</el-table-column>
+      <el-table-column prop="r_id" label="id"  width="330px"
+        align="center" sortable=“custom”></el-table-column>
       <el-table-column
         show-overflow-tooltip
         v-for="(item, index) in tableLabel"
@@ -82,6 +84,11 @@ export default {
     // 页码变化
     handleCurrentChangep(e) {
       this.$emit('handleCurrentChangep', e);
+    },
+    sortChanges(column){
+      this.$emit('sortChanges', column)
+      // console.log(column.prop);
+     
     }
 }
 }

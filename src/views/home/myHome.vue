@@ -71,7 +71,7 @@
       <!-- <CommonTag></CommonTag> -->
       <el-main class="main">
         <div class="bread">
-  <el-breadcrumb separator="|">
+  <el-breadcrumb separator="/">
     <!-- <el-breadcrumb-item  v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.name}}</el-breadcrumb-item> -->
   <el-breadcrumb-item :to="{path:'/show'}">首页</el-breadcrumb-item>
   <el-breadcrumb-item :to="'/'+tags.path" v-if="tags">{{tags.name}}</el-breadcrumb-item>
@@ -150,7 +150,7 @@ export default {
     getMenus() {
       this.menu=this.$store.state.menu
       // console.log(1111);
-      // console.log(this.menu);
+      console.log(this.menu);
     },
     handleSignout() {
       // 提示
@@ -167,23 +167,23 @@ export default {
             });
             // console.log(item);
             this.activePath=item.path
-            // console.log('/'+this.activePath);
+            console.log('/'+this.activePath);
             // 调用selectMenu 并传入item
             this.$store.commit('selectMenu',item)
 
         },
   },
-  // watch: {
-  //   '$route.path': function (newVal) {
-  //     // 为了防止和原有的高亮更新操作冲突，这里只更新自己需要的路由
-
-  //     if (newVal === '/show') {
-  //       // 为 :default-active 绑定的值 activepath 重新赋值，从而实现菜单栏的高亮更新
-  //       this.activePath = newVal
-  //       console.log(this.activePath);
-  //     }
-  //   }
-  // },
+  watch: {
+    '$route.path': function (newVal) {
+      // 为了防止和原有的高亮更新操作冲突，这里只更新自己需要的路由
+console.log(newVal);
+      if (newVal == '/show') {
+        // 为 :default-active 绑定的值 activepath 重新赋值，从而实现菜单栏的高亮更新
+        this.activePath = newVal
+        console.log(this.activePath);
+      }
+    }
+  },
   computed: {
     nochildren() {
       console.log(this.menu);
@@ -197,6 +197,7 @@ export default {
       tags:state=>state.currentMenu
       
     }),
+
   
     // onRoutes() {
     //   const route = this.$route
@@ -360,16 +361,15 @@ img {
 .aside {
   background-color: #1B2939;
 }
-/* .transitionRouter-enter-active,
-.transitionRouter-leave-active {
-    transition: all 0.4s;
+.v-enter-active, .v-leave-active {
+  transition: all .6s;
 }
-
-.transitionRouter-enter,
-.transitionRouter-leave{
-    transform: translate3d(100%, 0, 0);
-} */
-.v-enter{
+.v-enter, .v-leave-to
+/* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+/* .v-enter{
  opacity: 0;
 }
 .v-enter-active{
@@ -386,5 +386,18 @@ img {
 }
 .v-leave-active{
  transition: 0.3s;
+} */
+/* .v-enter-active {
+  transition:0.6s;
 }
+
+.v-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.v-enter-from,
+.v-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+} */
 </style>

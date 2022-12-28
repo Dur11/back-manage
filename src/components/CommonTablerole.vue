@@ -1,10 +1,12 @@
 <template>
   <div class="common-table">
     <!-- :data="用于存放请求数据回来的数组"  -->
-    <el-table :data="tableData"  height="90%" v-loading="tableData.length>0?false:true" 
-    element-loading-spinner="el-icon-loading"
+    <el-table :data="tableData.slice((query.pageNum-1)*query.pageSize,query.pageNum*query.pageSize)" height="90%" v-loading="tableData.length>0?false:true" 
+    element-loading-spinner="el-icon-loading" @sort-change="sortChange"
       ref="multipleTable" @selection-change="handleSelectionChange"  border  :header-cell-style="{background:'#FAFAFA'}" stripe>
       <el-table-column type="selection" width="50" align="center"></el-table-column>
+      <el-table-column prop="r_id" label="id"  width="250px"
+        align="center" sortable=“custom”></el-table-column>
       <el-table-column
         show-overflow-tooltip
         v-for="(item, index) in tableLabel"
@@ -20,14 +22,6 @@
           <span style="margin-left=10px">{{ scope.row[item.prop] }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" min-width="180" align="center">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>        
-          <el-button size="mini" type="warning" @click="handleSet(scope.row)">相关信息</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-        </template>
- 
-      </el-table-column> -->
       <el-table-column
              label="操作"
              v-if="isOperate"  align="center">
@@ -70,7 +64,7 @@ export default {
     }
   },
   mounted(){
-    this.showTableDate()  
+    
   },
   methods: {
     handleEdit(row) {
@@ -96,11 +90,11 @@ export default {
       this.$emit('handleCurrentChange', e);
       
     },
-    showTableDate () {   // 分页方法
-      this.allData = []
-      this.allData = this.allData.slice((this.currentPage - 1) * this.size, this.currentPage * this.size)
-      this.$emit('changeTableData', this.allData)
-    },
+    sortChange(column){
+      this.$emit('sortChange', column)
+      // console.log(column.prop);
+     
+    }
 }
 }
 </script>

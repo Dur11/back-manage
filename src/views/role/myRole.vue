@@ -22,12 +22,29 @@
        
        <div class="ruse">
         <el-button type="primary" @click="addRole" size="small" icon="el-icon-plus">新增</el-button>
-      <el-button type="danger" @click="deleAll" size="small" icon="el-icon-delete">批量删除</el-button>
-       </div>
+      <!-- <el-button type="danger" @click="deleAll" size="small" icon="el-icon-delete">批量删除</el-button> -->
+      <span class="delbtn">
+                  <el-popconfirm
+              title="确认删除这些数据吗？"
+              placement="left"
+              @confirm="deleteAll()"
+            >
+              <el-button
+              size="small"
+                 type="danger"
+                class="delete-btn"
+                icon="el-icon-delete"
+                slot="reference"
+                >批量删除</el-button
+              >
+            </el-popconfirm>
+
+          </span>  
+    </div>
       </div>
       <!-- 新增 -->
       <el-dialog :visible.sync="isAdd" width="30%" title="新增角色" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="角色">
           <el-input v-model="add.r_name" style="width:200px" placeholder="请输入角色名"></el-input>
@@ -45,7 +62,7 @@
           </el-select>
   </el-form-item>
       </el-form>
-      </el-card>
+      </el-card >
       <div slot="footer">
         <el-button @click="isAdd = false">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
@@ -53,7 +70,7 @@
     </el-dialog>
     <!-- 编辑 -->
     <el-dialog :visible.sync="isEdit" width="30%" title="角色修改" class="dadd">
-     <el-card>
+     <el-card class="card">
       <el-form>
         <el-form-item label="角色">
           <el-input v-model="add.r_name" style="width:200px"></el-input>
@@ -65,20 +82,9 @@
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- <el-dialog :visible.sync="isShow" width="50%">
-      <common-form
-        :formLabel="operateFormLabel"
-        :form="operateForm"
-        :inline="true"
-      >
-      </common-form>
-      <div slot="footer">
-        <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确 定</el-button>
-      </div>
-    </el-dialog> -->
+
     <el-dialog :visible.sync="isOpen" width="30%" title="角色权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="权限拥有:">
           <el-tag v-for="(item,index) in this.roleData" :key="index">{{item}}</el-tag>
@@ -101,7 +107,7 @@
         :isOperate='true'
         @handleSizeChange="handleSizeChange"
         @handleCurrentChange="handleCurrentChange"
-       
+       @sortChange="sortChange"
         ref="multipleTable"
       >
       <template slot-scope="data">
@@ -114,12 +120,23 @@
                  size="mini"
                  @click="setPre( data.row)"
                  icon="el-icon-view">查看权限</el-button>
-                  <el-button
-                 
-                 size="mini"
+                 <span class="delbtn">
+                  <el-popconfirm
+              title="确认删除这行数据吗？"
+              placement="top"
+              @confirm="deleteTestCase(data.row)"
+            >
+              <el-button
+              size="mini"
                  type="danger"
-                 @click="delUser( data.row)"
-                 icon="el-icon-delete">删除</el-button>
+                class="delete-btn"
+                icon="el-icon-delete"
+                slot="reference"
+                >删除</el-button
+              >
+            </el-popconfirm>
+
+          </span>
 
              </template>
     </CommonTable>
@@ -158,10 +175,10 @@ import CommonTable from '@/components/CommonTablerole.vue'
       tableData: [],
       // // table中列的配置数据
       tableLabel: [
-        {
-          prop: 'r_id',
-          label: 'id',
-        },
+        // {
+        //   prop: 'r_id',
+        //   label: 'id',
+        // },
         {
           prop: 'r_name',
           label: '角色',
@@ -325,7 +342,6 @@ import CommonTable from '@/components/CommonTablerole.vue'
       console.log(this.add.s_id);
     },
     addRole() {
-      // console.log(111);
       (this.isAdd = true),
         (this.operateType = 'add'),
         // 数据初始化
@@ -333,10 +349,8 @@ import CommonTable from '@/components/CommonTablerole.vue'
           r_name: '',
           s_id:''
         })
-        // console.log(this.add);
     },
     editUser(row) {
-      // console.log(row);
       this.operateType = 'edit'
       this.isEdit= true
       this.add = {
@@ -344,16 +358,10 @@ import CommonTable from '@/components/CommonTablerole.vue'
           r_name: row.r_name,
           // s_id:row.s_id,
         }
-      console.log(row)
     },
-    // 删除
-    delUser(row) {
-      this.$confirm('确定删除该条数据?', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定',
-        type: 'warning',
-      }).then(() => {
-        const id = row.r_id
+  
+    deleteTestCase(row){
+      const id = row.r_id
         this.api.post('/delRole', { r_id: id }).then(() => {
           // $message、$confirm 为ElementUI弹出框的相关属性
           this.$message({
@@ -362,76 +370,32 @@ import CommonTable from '@/components/CommonTablerole.vue'
           })
           this.getList()
         })
-      })
     },
-    // 批量删除
-    deleAll(){
+   
+    deleteAll(){
       var arr=[]
-      // const id=this.$refs.multipleTable.multipleSelection
-      // console.log(this.$refs.multipleTable.multipleSelection)
       this.$refs.multipleTable.multipleSelection.forEach(row=>arr.push(row.r_id))
-      this.$confirm('确定删除该条数据?', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定',
-        type: 'warning',
-      }).then(()=>{
-        this.api.post('/delRoles',arr).then(()=>{
-        this.$message({
+        this.api.post('/delRoles',arr).then((res) => {
+          // $message、$confirm 为ElementUI弹出框的相关属性
+          if(res==false){
+            this.$message({
+            type: 'error',
+            message: '删除失败',
+          })
+          }else{
+            this.$message({
             type: 'success',
             message: '删除成功',
           })
+          }
           this.getList()
-      })
-      })
+        })
     },
     getList(){
         this.api.post('/roleList',this.form).then((res) => {
-        // this.tableData=res
-        this.table = res
-        const DataAll = this.table
-        //每次执行方法，将展示的数据清空
-        this.tableData = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.query.pageNum * this.query.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (DataAll.length % this.query.pageSize == 0) {
-          resStrLength =
-            (parseInt(DataAll.length / this.query.pageSize) - 1) *
-              this.query.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(DataAll.length / this.query.pageSize) *
-              this.query.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > DataAll.length) {
-          endlength = DataAll.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tableData.push(DataAll[i])
-        }
-        this.tableData.forEach((item) => {
-          if (item.s_id == 2) {
-            item.s_id = '学生'
-          } else if(item.s_id == 3){
-            item.s_id = '教师'
-          }else{
-            item.s_id = '管理员'
-          }
-        })
+        this.tableData=res
         //数据的总条数
-        this.query.total = DataAll.length  
+        this.query.total = this.tableData.length  
          this.tableData.forEach((item)=>{
           if(item.s_id==2){
             item.s_id='学生'
@@ -467,14 +431,23 @@ import CommonTable from '@/components/CommonTablerole.vue'
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
       this.query.pageSize = val
-      this.getList()
     },
     //切换页数，执行方法
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`)
       this.query.pageNum = val
-      this.getList()
-    // },
+  },
+  sortChange(val){
+    if(val.order==='ascending'){
+        this.tableData=this.tableData.sort((a,b)=>{
+          // console.log(a.u_id,b.u_id);
+            return a.r_id-b.r_id
+        })
+      }else if(val.order==='descending'){
+        this.tableData=this.tableData.sort((a,b)=>{          
+            return b.r_id-a.r_id
+        })
+      }
   },
 },
 
@@ -507,7 +480,7 @@ import CommonTable from '@/components/CommonTablerole.vue'
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 20px;
+  padding: 5px 15px;
   border-bottom:1px solid #e9eef3;
 }
 

@@ -189,7 +189,6 @@ export default {
 <style scoped>
 .login-warp {
   height: 100%;
-  /* background-color: #324152; */
   background: url(@/assets/back.jpg) no-repeat;
   background-size: 100% 100%;
     background-attachment: fixed;/* 不设置的话页面滑动时，背景会不铺满*/
@@ -202,17 +201,17 @@ export default {
 }
 .login-warp .login-form {
   width: 400px;
-  background-color: #fff;
-  border-radius: 5px;
+  background-color: #00000060;
+  border-radius: 4px;
+    box-shadow: 0px 21px 41px 0px rgba(0, 0, 0, 0.2);
   padding: 30px;
 }
 .login-warp .login-btn {
   width: 100%;
+  background-image: linear-gradient(to right, #30cfd0, #330867);
 }
-.yzm {
-  /* position: absolute; */
-  /* display: flex; */
-  /* align-items: center; */
+h2{
+  color: #fff;
 }
 .yan {
   display: flex;
@@ -226,4 +225,5 @@ export default {
 .msg .el-dialog__body{
   font-size: 40px;
 }
+
 </style>

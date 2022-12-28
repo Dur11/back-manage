@@ -161,12 +161,10 @@ export default {
         },
         color: ['#9999FF', '#66CCCC', '#0099CC'],
         //左上侧分类条形符
-        // legend: {
-        // orient: 'vertical',
-        // left: 'left',
-        // //通过跨域获取数据给data赋值
-        // data: []
-        // },
+        legend: {
+        orient: 'vertical',
+        left: 'left',
+        },
         //饼状图类型以及数据源
         series: [
           {
@@ -216,12 +214,10 @@ export default {
         },
         color: ['#9999FF', '#0099CC'],
         //左上侧分类条形符
-        // legend: {
-        // 	orient: 'vertical',
-        // 	left: 'left',
-        // 	//通过跨域获取数据给data赋值
-        // 	data: []
-        // },
+        legend: {
+        orient: 'vertical',
+        left: 'left',
+        },
         //饼状图类型以及数据源
         series: [
           {

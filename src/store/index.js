@@ -45,7 +45,6 @@ export default new Vuex.Store({
       
     }else{
       state.currentMenu = null
-      // console.log(state.currentMenu);
     }
 },
 //   getMenu(state){

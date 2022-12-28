@@ -9,6 +9,7 @@
         :query="query"
         @handleSizeChange="handleSizeChange"
         @handleCurrentChange="handleCurrentChange"
+        @sortChange="sortChange"
         @look="lookUser"
         @del="delUser"
         @set="setPre"
@@ -16,7 +17,7 @@
       ></CommonTable>
       <!-- 查看 -->
       <el-dialog :visible.sync="isOpen" width="30%" title="用户权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="包含的权限有:">
           <el-tag v-for="(item,index) in this.preData" :key="index">{{item}}</el-tag>
@@ -28,16 +29,8 @@
         
       </div>
     </el-dialog>
-    <!-- <el-dialog :visible.sync="isOpenn" width="30%">
-      该用户暂无限权
-      <div slot="footer">
-        <el-button @click="isOpenn = false">关闭</el-button>
-        
-      </div>
-    </el-dialog> -->
-    <!-- 添加限权 -->
     <el-dialog :visible.sync="isAdd" width="30%" title="新增用户权限" class="dadd">
-     <el-card>
+     <el-card class="card">
       <el-form>
         <el-form-item label="限权" >
           <el-select
@@ -47,11 +40,16 @@
             style="width: 150px"
             @click.native="inSee"
           >
-          <el-option v-for="(item,index) in this.xdata" :key="index" :label="item.re_name" :value="item.re_id"></el-option>
-
-          </el-select>
+          <el-option v-for="(item,index) in this.xdata" :key="index" :label="item.re_name" :value="item.re_id"></el-option>         
+          </el-select>         
   </el-form-item>
       </el-form>
+      <!-- <el-radio-group v-model="radioValue">
+    <el-radio v-for="(item,index) in this.xdata" :key="index" :label="item.re_name">
+        {{item.re_name}}
+    </el-radio>
+</el-radio-group> -->
+
      </el-card>
       <div slot="footer">
         <el-button @click="isAdd = false">取 消</el-button>
@@ -60,7 +58,7 @@
     </el-dialog>
     <!-- 删除 -->
     <el-dialog :visible.sync="isdel" width="30%" title="删除用户权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="限权" >
           <el-select
@@ -90,6 +88,7 @@ export default{
   components:{CommonTable},
   data(){
     return{
+      radioValue:'',
       isOpen:false,
       // isOpenn:false,
       isAdd:false,
@@ -98,10 +97,6 @@ export default{
       tableData: [],
       // // table中列的配置数据
       tableLabel: [
-        {
-          prop: 'u_id',
-          label: 'id',
-        },
         {
           prop: 'u_name',
           label: '姓名',
@@ -154,6 +149,7 @@ export default{
           this.xdata.push(item)
         })
       })
+      console.log(this.xdata);
     },
     noSee(){
       // console.log(this.xquan);
@@ -169,6 +165,9 @@ export default{
       this.xquan.re_id=val
       console.log(this.xquan.re_id);
     },
+    // seePow(row){
+
+    // },
     lookUser(row){
       
       const id=row.u_id
@@ -179,6 +178,7 @@ export default{
           if(res.msg=='成功'){
             this.isOpen=true
             res.data.forEach(item=>this.preData.push(item.re_name))
+            console.log(this.preData);
         }else{
           // this.isOpen=false
           // this.isOpenn=true
@@ -232,47 +232,14 @@ export default{
         
     },
     getList(){
-      this.table=[]
+      this.tableData=[]
         this.api.post('/user_resource/queryUserResource').then((res) => {
         res.forEach(item => {
           
-          this.table.push(item.user)
+          this.tableData.push(item.user)
          
         })
-        const DataAll = this.table
-        // console.log(DataAll);
-        //每次执行方法，将展示的数据清空
-        this.tableData = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.query.pageNum * this.query.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (DataAll.length % this.query.pageSize == 0) {
-          resStrLength =
-            (parseInt(DataAll.length / this.query.pageSize) - 1) *
-              this.query.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(DataAll.length / this.query.pageSize) *
-              this.query.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > DataAll.length) {
-          endlength = DataAll.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tableData.push(DataAll[i])
-        }
+       
         this.tableData.forEach((item) => {
           // console.log(item);
           if (item.s_id == 2) {
@@ -284,7 +251,7 @@ export default{
           }
         })
         //数据的总条数
-        this.query.total = DataAll.length  
+        this.query.total = this.tableData.length  
     
     },
    
@@ -293,14 +260,23 @@ export default{
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
       this.query.pageSize = val
-      this.getList()
     },
     //切换页数，执行方法
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`)
       this.query.pageNum = val
-      this.getList()
-    // },
+  },
+  sortChange(val){
+    if(val.order==='ascending'){
+        this.tableData=this.tableData.sort((a,b)=>{
+          // console.log(a.u_id,b.u_id);
+            return a.u_id-b.u_id
+        })
+      }else if(val.order==='descending'){
+        this.tableData=this.tableData.sort((a,b)=>{          
+            return b.u_id-a.u_id
+        })
+      }
   },
   }
 }

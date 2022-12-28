@@ -16,11 +16,33 @@
         :tableData="tableData"
         :tableLabel="tableLabel"
         :query="query"
+        :isOperate='true'
         @handleSizeChange="handleSizeChange"
         @handleCurrentChange="handleCurrentChange"
-        @del="delPow"
-        @edit="editUser"
-      ></CommonTable>
+        @sortChange="sortChange"
+      >
+      <template slot-scope="data">
+          <el-button size="mini" @click="editUser(data.row)" icon="el-icon-edit">编辑</el-button> 
+          <!-- <el-button size="mini" type="danger" @click="delPow(data.row)" icon="el-icon-delete">删除</el-button> -->
+          <span class="delbtn">
+                  <el-popconfirm
+              title="确认删除这行数据吗？"
+              placement="top"
+              @confirm="deleteTestCase(data.row)"
+            >
+              <el-button
+              size="mini"
+                 type="danger"
+                class="delete-btn"
+                icon="el-icon-delete"
+                slot="reference"
+                >删除</el-button
+              >
+            </el-popconfirm>
+
+          </span>
+        </template>
+    </CommonTable>
     </el-tab-pane>
     <el-tab-pane label="分配权限列表" name="second">
       <div class="pow">角色权限列表</div>
@@ -33,13 +55,14 @@
         @del="shareDel"
         @edit="shareAdd"
         @set="shareSee"
+        @sortChanges="sortChanges"
       ></PowTable>
     </el-tab-pane>
   </el-tabs>
   
        <!-- 添加限权 -->
     <el-dialog :visible.sync="isAdd" width="30%" title="新增权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="限权" >
           <el-input v-model="add.re_name" style="width:200px" placeholder="请输入权限名，如：权限2"></el-input>
@@ -53,7 +76,7 @@
     </el-dialog>
     <!-- 编辑限权 -->
     <el-dialog :visible.sync="isEdit" width="30%" title="修改权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
   
   <el-form-item label="限权" >
@@ -68,7 +91,7 @@
     </el-dialog>
     <!-- 分配权限-查看 -->
     <el-dialog :visible.sync="isOpen" width="30%" title="角色权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="包含的权限有:">
           <el-tag v-for="(item,index) in this.preData" :key="index">{{item}}</el-tag>
@@ -82,7 +105,7 @@
     </el-dialog>
     <!-- 分配权限-增加 -->
      <el-dialog :visible.sync="ispowAdd" width="30%" title="添加权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="限权" >
           <el-select
@@ -105,7 +128,7 @@
     </el-dialog>
     <!-- 分配权限-删除 -->
     <el-dialog :visible.sync="ispowDel" width="30%" title="删除权限" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
         <el-form-item label="限权" >
           <el-select
@@ -140,20 +163,12 @@ export default{
       // // table中列的配置数据
       tableLabel: [
         {
-          prop: 're_id',
-          label: 'id',
-        },
-        {
           prop: 're_name',
           label: '权限',
         },
       ],
       tablePow:[],
       powLabel:[
-        {
-          prop: 'r_id',
-          label: 'id',
-        },
         {
           prop: 'r_name',
           label: '角色',
@@ -250,98 +265,28 @@ export default{
       console.log(this.xquan.re_id);
     },
     getList(){
-      this.table=[]
+      this.tableData=[]
       this.api.post('/resourceList').then((res)=>{
         res.data.forEach(item => {
           
-          this.table.push(item)
+          this.tableData.push(item)
           
         })
-        const DataAll = this.table
-        // console.log(DataAll);
-        //每次执行方法，将展示的数据清空
-        this.tableData = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.query.pageNum * this.query.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (DataAll.length % this.query.pageSize == 0) {
-          resStrLength =
-            (parseInt(DataAll.length / this.query.pageSize) - 1) *
-              this.query.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(DataAll.length / this.query.pageSize) *
-              this.query.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > DataAll.length) {
-          endlength = DataAll.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tableData.push(DataAll[i])
-        }
-      
+
         //数据的总条数
-        this.query.total = DataAll.length  
+        this.query.total = this.tableData.length  
         
       })
     },
     getRole(){
-      this.tablep=[]
+      this.tablePow =[]
       this.api.post('/roleList',this.form).then((res)=>{
         res.forEach(item => {
-          console.log(item);
-          this.tablep.push(item)
+          this.tablePow .push(item)
         })
-        console.log(this.tablep);
-        // console.log(this.table);
-        const DataAllpow = this.tablep
-        console.log(DataAllpow);
-        //每次执行方法，将展示的数据清空
-        this.tablePow = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.pquery.pageNum - 1) * this.pquery.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.pquery.pageNum * this.pquery.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (DataAllpow.length % this.pquery.pageSize == 0) {
-          resStrLength =
-            (parseInt(DataAllpow.length / this.pquery.pageSize) - 1) *
-              this.pquery.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(DataAllpow.length / this.pquery.pageSize) *
-              this.pquery.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > DataAllpow.length) {
-          endlength = DataAllpow.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tablePow.push(DataAllpow[i])
-        }
+        
         //数据的总条数
-        this.pquery.total = DataAllpow.length  
+        this.pquery.total = this.tablePow .length  
        
       })
     },
@@ -357,13 +302,9 @@ export default{
       this.edit=row
       },
     
-    delPow(row){
-      this.$confirm('确定删除该条数据?', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定',
-        type: 'warning',
-      }).then(() => {
-        const id = row.re_id
+   
+    deleteTestCase(row){
+      const id = row.re_id
         this.api.post('/delResource', { re_id: id }).then(() => {
           // $message、$confirm 为ElementUI弹出框的相关属性
           this.$message({
@@ -372,7 +313,6 @@ export default{
           })
           this.getList()
         })
-      })
     },
     confirm() {
       if (this.operateType == 'add') {
@@ -439,7 +379,6 @@ export default{
             message: '该用户暂无权限',
           })
         }
-        console.log(this.preData)
     })
   },
 //  增加
@@ -492,27 +431,43 @@ confirmPow(){
   handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
       this.query.pageSize = val
-      this.getList()
     },
     //切换页数，执行方法
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`)
       this.query.pageNum = val
-      this.getList()
-    // },
   },
     //切换当前页显示的数据条数，执行方法
   handleSizeChangep(val) {
       console.log(`每页 ${val} 条`)
       this.pquery.pageSize = val
-      this.getRole()
     },
     //切换页数，执行方法
     handleCurrentChangep(val) {
       console.log(`当前页: ${val}`)
       this.pquery.pageNum = val
-      this.getRole()
-    // },
+  },
+  sortChange(val){
+    if(val.order==='ascending'){
+        this.tableData=this.tableData.sort((a,b)=>{
+            return a.re_id-b.re_id
+        })
+      }else if(val.order==='descending'){
+        this.tableData=this.tableData.sort((a,b)=>{          
+            return b.re_id-a.re_id
+        })
+      }
+  },
+  sortChanges(val){
+    if(val.order==='ascending'){
+          this.tablePow=this.tablePow.sort((a,b)=>{
+            return a.r_id-b.r_id
+        })
+      }else if(val.order==='descending'){
+        this.tablePow=this.tablePow.sort((a,b)=>{          
+            return b.r_id-a.r_id
+        })
+      }
   },
 }
 }

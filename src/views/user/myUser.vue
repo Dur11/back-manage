@@ -9,8 +9,7 @@
             placeholder="性别"
             @change="seSelect"
             style="width: 150px"
-            clearable
-    @clear="setValueNull"
+
           >
             <el-option
               v-for="item in sexSelect"
@@ -24,6 +23,7 @@
             placeholder="身份"
             @change="poSelect"
             style="width: 150px"
+           
           >
             <el-option
               v-for="item in posSelect"
@@ -37,6 +37,7 @@
             placeholder="按年龄排序"
             @change="ageSelect"
             style="width: 150px"
+           
           >
             <el-option
               v-for="item in orderByAge"
@@ -50,6 +51,7 @@
             placeholder="按id排序"
             @change="idSelect"
             style="width: 150px"
+           
           >
             <el-option
               v-for="item in orderById"
@@ -98,8 +100,8 @@
     </div>
     <!-- 增加 -->
     <el-dialog :visible.sync="isAdd" width="30%"  title="新增用户" class="dadd">
-    <el-card>
-      <el-form>
+    <el-card class="card">
+      <el-form class="form">
           <el-form-item label="姓名">
     <el-input v-model="add.u_name" style="width:200px" placeholder="请输入姓名" required></el-input>
         </el-form-item>
@@ -107,8 +109,8 @@
     <el-input v-model="add.u_age" style="width:200px" placeholder="请输入年龄"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-radio v-model="add.u_sex" label="男">男</el-radio>
-  <el-radio v-model="add.u_sex" label="女">女</el-radio>
+          <el-radio v-model="add.u_sex" label="男"></el-radio>
+  <el-radio v-model="add.u_sex" label="女"></el-radio>
   </el-form-item>
   <el-form-item label="身份">
           <el-select
@@ -131,7 +133,7 @@
     </el-dialog>
     <!-- 编辑 -->
     <el-dialog :visible.sync="isedit" width="30%" title="修改用户信息" class="dadd">
-      <el-card>
+      <el-card class="card">
         <el-form>
           <el-form-item label="姓名">
     <el-input v-model="add.u_name" style="width:200px"></el-input>
@@ -140,8 +142,8 @@
     <el-input v-model="add.u_age" style="width:200px"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-radio v-model="add.u_sex" label="男">男</el-radio>
-  <el-radio v-model="add.u_sex" label="女">女</el-radio>
+          <el-radio v-model="add.u_sex" label="男"></el-radio>
+  <el-radio v-model="add.u_sex" label="女"></el-radio>
   </el-form-item>
       </el-form>
       
@@ -153,26 +155,26 @@
     </el-dialog>
     
     <el-dialog :visible.sync="isOpen" width="30%" class="dadd perData" title="用户相关信息" text-algin='center'>
-      <el-card>
-        <el-form>
+      <el-card class="card">     
+        <el-form >          
         <el-form-item label="姓名:">
-          {{this.basicdata.u_name}}
+          <span class="mess">{{this.basicdata.u_name}}</span>
     </el-form-item>
     <el-form-item label="年龄:">
-          {{this.basicdata.u_age}}
+         <span class="mess"> {{this.basicdata.u_age}}</span>
     </el-form-item>
     <el-form-item label="性别:">
-          {{this.basicdata.u_sex}}
+          <span class="mess">{{this.basicdata.u_sex}}</span>
     </el-form-item>
     <el-form-item label="角色:">
-          {{this.basicdata.s_id}}
+          <span class="mess">{{this.basicdata.s_id}}</span>
     </el-form-item>
         <el-form-item label="角色拥有:">
           <el-tag v-for="(item,index) in this.roleData" :key="index">{{item}}</el-tag>
     </el-form-item>
     <el-form-item label="未拥有角色:">
       <el-tag v-for="(item,index) in this.nroleData" :key="index">{{item}}</el-tag>
-    </el-form-item>
+    </el-form-item> 
       </el-form>
       <div slot="footer">
         <el-button @click="isOpen = false">关闭</el-button>
@@ -186,9 +188,9 @@
         :tableLabel="tableLabel"
         :query="query"
         :isOperate='true'
+        @sortChange="sortChange"
         @handleSizeChange="handleSizeChange"
-        @handleCurrentChange="handleCurrentChange"
-        @changeTableData="changeTableData"       
+        @handleCurrentChange="handleCurrentChange"      
       >
       <template slot-scope="data">
                  <el-button               
@@ -201,13 +203,29 @@
                  type="warning"
                  @click="setPre( data.row)"
                  icon="el-icon-setting">相关信息</el-button>
-                  <el-button
+                  <!-- <el-button
                  
                  size="mini"
                  type="danger"
                  @click="delUser( data.row)"
-                 icon="el-icon-delete">删除</el-button>
+                 icon="el-icon-delete">删除</el-button> -->
+                <span class="delbtn">
+                  <el-popconfirm
+              title="确认删除这行数据吗？"
+              placement="top"
+              @confirm="deleteTestCase(data.row)"
+            >
+              <el-button
+              size="mini"
+                 type="danger"
+                class="delete-btn"
+                icon="el-icon-delete"
+                slot="reference"
+                >删除</el-button
+              >
+            </el-popconfirm>
 
+          </span>
              </template>
     </CommonTable>
     </div>
@@ -384,11 +402,10 @@ export default {
         total: 0,
       },
       // 搜索条件
-    //   listQuery: {
-    //  email: undefined,
-    //  spageNum: 1,
-    //   spageSize: 10,
-    // },
+      listQuery: {
+        page: 1,
+        limit: 8,
+    },
       form: {
         u_sex: '',
         s_id: ' ',
@@ -417,15 +434,12 @@ export default {
         s_id: '',
       },
       value6:[],
-      value7:[]
-
+      value7:[],
+      column:''
     }
   },
   mounted() {},
   methods: {
-    setValueNull() {
-           this.value1=null;
-        },
     inSex(val){
       this.add.u_sex=val
     },
@@ -522,14 +536,8 @@ export default {
         u_sex: row.u_sex,
       }
     },
-    // 删除
-    delUser(row) {
-      this.$confirm('确定删除该条数据?', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定',
-        type: 'warning',
-      }).then(() => {
-        const id = row.u_id
+    deleteTestCase(row){
+      const id = row.u_id
         this.api.post('/delUser', { u_id: id }).then(() => {
           // $message、$confirm 为ElementUI弹出框的相关属性
           this.$message({
@@ -538,7 +546,6 @@ export default {
           })
           this.getList()
         })
-      })
     },
     // 设置权限
     setPre(row){
@@ -567,41 +574,8 @@ export default {
     },
     getList() {
       this.api.get('/userPage').then((res) => {
-        this.table=[]
-        this.table = res.records
-        const DataAll = this.table
-        //每次执行方法，将展示的数据清空
-        this.tableData = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.query.pageNum * this.query.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (DataAll.length % this.query.pageSize == 0) {
-          resStrLength =
-            (parseInt(DataAll.length / this.query.pageSize) - 1) *
-              this.query.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(DataAll.length / this.query.pageSize) *
-              this.query.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > DataAll.length) {
-          endlength = DataAll.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tableData.push(DataAll[i])
-        }
+        console.log(res);
+        this.tableData = res.records
         this.tableData.forEach((item) => {
           // console.log(item);
           if (item.s_id == 2) {
@@ -613,7 +587,7 @@ export default {
           }
         })
         //数据的总条数
-        this.query.total = DataAll.length
+        this.query.total = this.tableData.length
       })
       // this.api.post('/userPage',this.query).then((res)=>{
       //   this.query.total = res.records.length
@@ -624,18 +598,41 @@ export default {
       console.log(`每页 ${val} 条`)
       this.query.pageSize = val
       // this.listQuery.spageSize=val
-      this.getList()
+      // this.getList()
     },
     //切换页数，执行方法
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`)
       this.query.pageNum = val
       // this.listQuery.spageNum=val
-      this.getList()
+      // this.getList()
     },
-    changeTableData (val) {
-       this.tableData = val
-	},
+  //   changeTableData (val) {
+  //      this.tableData = val
+	// },
+  sortChange(val){
+    // console.log(val.prop);
+    // this.column=val.prop
+    // console.log(this.column);
+    if(val.order==='ascending'){
+        this.tableData=this.tableData.sort((a,b)=>{
+          // console.log(a.u_id,b.u_id);
+          if(val.prop=='u_id'){
+            return a.u_id-b.u_id
+          }else if(val.prop=='u_age'){
+            return a.u_age-b.u_age
+          }
+        })
+      }else if(val.order==='descending'){
+        this.tableData=this.tableData.sort((a,b)=>{
+          if(val.prop=='u_id'){
+            return b.u_id-a.u_id
+          }else if(val.prop=='u_age'){
+            return b.u_age-a.u_age
+          }
+        })
+      }
+  },
     getSearch(){
         if(this.ins.ins==0){
             this.searchForm.u_id = this.inputContent;
@@ -685,45 +682,8 @@ export default {
     consult() {
     //   console.log(this.form)
       this.api.post('/selectBy', this.form).then((res) => {
-        // console.log(this.searchForm);
-        // console.log(res);
-        // this.tableData = []
-        // this.tableData = res
-        this.stable=[]
-        this.stable = res
-        const sDataAll = this.stable
-        //每次执行方法，将展示的数据清空
-        this.tableData = []
-        //1、当前页的第一条数据在总数据中的位置
-        let strlength = (this.query.pageNum - 1) * this.query.pageSize + 1
-        //2、当前页的最后一条数据在总数据中的位置
-        let endlength = this.query.pageNum * this.query.pageSize
-        //3、此判断很重要，执行时机：当分页的页数在最后一页时，进行重新筛选获取数据时
-        //获取本次表格最后一页第一条数据所在的位置的长度
-        let resStrLength = 0
-        if (sDataAll.length % this.query.pageSize == 0) {
-          resStrLength =
-            (parseInt(sDataAll.length / this.query.pageSize) - 1) *
-              this.query.pageSize +
-            1
-        } else {
-          resStrLength =
-            parseInt(sDataAll.length / this.query.pageSize) *
-              this.query.pageSize +
-            1
-        }
-        //如果上一次表格的最后一页第一条数据所在的位置的长度 大于 本次表格最后一页第一条数据所在的位置的长度，则将本次表格的最后一页第一条数据所在的位置的长度 为最后长度
-        if (strlength > resStrLength) {
-          strlength = resStrLength
-        }
-        //4、当分页的页数切换至最后一页，如果最后一页获取到的数据长度不足最后一页设置的长度，则将设置的长度 以 获取到的数据长度 为最后长度
-        if (endlength > sDataAll.length) {
-          endlength = sDataAll.length
-        }
-        //5、循环获取当前页数的数据，放入展示的数组中
-        for (let i = strlength - 1; i < endlength; i++) {
-          this.tableData.push(sDataAll[i])
-        }
+        this.tableData = res
+       
         this.tableData.forEach((item) => {
           // console.log(item);
           if (item.s_id == 2) {
@@ -735,7 +695,7 @@ export default {
           }
         })
         //数据的总条数
-        this.query.total = sDataAll.length
+        this.query.total = this.tableData.length
       })
     },
   },
@@ -819,9 +779,23 @@ float: left;
 } */
 .dadd .el-dialog{
   border-radius: 8px;
+  background-color: #303F53;
+}
+.card{
+  padding: 0px;
+  background-color: #1B2939 !important;
+}
+.el-form-item__label {
+  color: #fff !important;
+}
+.el-radio__label{
+  color: #fff !important;
+}
+.mess{
+  color: #fff;
 }
 .el-dialog{
-  border-radius: 8px;
+  /* border-radius: 8px; */
 
   border: 1px solid rgb(13, 210, 236);
 }
@@ -837,5 +811,12 @@ float: left;
   }
 .dadd .el-dialog__body{
   /* padding:20px 80px ; */
+  /* color: #fff; */
 }
+.delbtn{
+  margin-left: 10px;
+}
+.el-tag + .el-tag {
+    margin-left: 10px;
+  }
 </style>
